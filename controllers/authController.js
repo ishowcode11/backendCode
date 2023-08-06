@@ -25,7 +25,7 @@ exports.signUp = async (req, res) => {
     };
 
     const user = User.create(obj);
-    const token = jwt.sign({ _id: user._id }, secret);
+    const token = jwt.sign({ id: user._id }, secret);
 
     res.status(200).json({
       status: "success",
@@ -69,18 +69,20 @@ exports.login = async (req, res) => {
       });
     }
 
-    const token = jwt.sign({ _id: user._id }, secret);
+    const token = jwt.sign({ id: user._id }, secret);
 
     res.status(200).json({
       status: "success",
       token,
     });
-
-    // [] { }
-  } catch (err) {}
+  } catch (err) {
+    res.status(400).json({
+      status: "failed",
+      message: err.message
+  }
 };
 
-// protect         // airlines ==> req.headers = {authorization: "bearer hdhwtf2gw"}
+// protect         
 exports.protect = async (req, res, next) => {
   try {
     const { authorization } = req.headers;
@@ -92,16 +94,28 @@ exports.protect = async (req, res, next) => {
     }
     // bearer gvsgsvdg
 
+    if (!authorization.startsWith("bearer")) {
+       return res.status(400).json({
+        status: "failed",
+        message: "authorization does not contain bearer property",
+      });
+    }
+
     const token = authorization.split(" ")[1];
     jwt.verify(token, (err, results) => {
       if (err) {
-        //_id: user._id
         return res.status(403).json({
           status: "failed",
           message: "unauthorized user",
         });
       }
+      req.currentUser = jwt.decode(token).id;
       next();
     });
-  } catch (err) {}
+  } catch (err) {
+     return res.status(403).json({
+        status: "failed",
+        message: err.message
+      });
+  }
 };
