@@ -102,7 +102,7 @@ exports.protect = async (req, res, next) => {
     }
 
     const token = authorization.split(" ")[1];
-    jwt.verify(token, (err, results) => {
+    jwt.verify(token, secret, (err, results) => {
       if (err) {
         return res.status(403).json({
           status: "failed",
