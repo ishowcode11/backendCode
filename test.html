@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Date-Time Input Example</title>
+</head>
+<body>
+  <h1>Date-Time Input Example</h1>
+  <form id="datetimeForm">
+    <label for="datetime">Select a date and time:</label>
+    <input type="datetime-local" id="datetime" name="datetime" required>
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    document.getElementById('datetimeForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      // Get the selected date-time value from the input field
+      const localDateTime = document.getElementById('datetime').value;
+      const utcDateTime = new Date(localDateTime).toISOString();
+
+      // Replace 'https://your-random-api-endpoint.com' with your actual random API endpoint
+      const randomApiEndpoint = 'http://127.0.0.1:8000/api/v1/test';
+
+      // Prepare the data to be sent to the API
+      const data = { datetime: utcDateTime };
+      console.log(utcDateTime)
+      // Make a POST request to the random API endpoint
+      fetch(randomApiEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Handle the response from the API if needed
+        console.log('API response:', data);
+      })
+      .catch(error => {
+        // Handle any errors that occurred during the fetch
+        console.error('Error:', error);
+      });
+    });
+  </script>
+</body>
+</html>
